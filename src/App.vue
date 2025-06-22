@@ -1,26 +1,64 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div id="app">
+    <Sidebar v-if="$route.name !== 'Login'" @toggle="handleToggleSidebar" :class="{ collapsed: sidebarWidth === '80px' }" />
+    <div class="content" :style="{ marginLeft: $route.name !== 'Login' ? sidebarWidth : '0' }">
+      <div class="inner-content">
+        <router-view />
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Sidebar from './components/partial/Sidebar.vue';
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    Sidebar
+  },
+  data() {
+    return {
+      sidebarWidth: '240px'
+    };
+  },
+  methods: {
+    handleToggleSidebar(isSidebarOpen) {
+      this.sidebarWidth = isSidebarOpen ? '240px' : '80px';
+    }
   }
-}
+};
 </script>
 
-<style>
+<style scoped>
 #app {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
   font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+}
+
+.sidebar {
+  width: 240px;
+  transition: width 0.3s;
+}
+
+.sidebar.collapsed {
+  width: 80px;
+}
+
+.content {
+  flex-grow: 1;
+  overflow-y: auto;
+  transition: margin-left 0.3s;
+  background-color: #f5f5f5;
+}
+
+.inner-content {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  height: 100%; /* Makes sure children are vertically centered */
+  width: 100%;
 }
 </style>
