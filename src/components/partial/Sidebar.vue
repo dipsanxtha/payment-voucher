@@ -1,9 +1,18 @@
 <template>
   <aside class="sidebar" :class="{ collapsed: !isSidebarOpen }">
+    <!-- Profile Section -->
+    <!-- <div class="profile-section">
+      <div v-if="isSidebarOpen" class="profile-info">
+        <div class="profile-name">John Doe</div>
+        <div class="profile-email">john.doe@email.com</div>
+        <div class="profile-role">Admin</div>
+        <button class="view-profile-btn">View Profile</button> -->
+      <!-- </div>
+    </div> -->
     <!-- Logo and Toggle -->
     <div class="logo-wrapper">
       <img
-        src="https://i.pinimg.com/736x/65/7c/e2/657ce27b552591220b251e3c8bfd6334.jpg"
+        src="https://i.pinimg.com/736x/27/25/51/272551f228fc74d104cc3aece28430b4.jpg"
         alt="Logo"
         class="logo"
       />
@@ -14,6 +23,10 @@
 
     <!-- Navigation -->
     <nav class="nav">
+      <router-link to="/profile" :class="{ active: $route.path === '/profile' }">
+        <i class="fas fa-user"></i>
+        <span v-if="isSidebarOpen">Profile</span>
+      </router-link>
       <router-link to="/dashboard" :class="{ active: $route.path === '/dashboard' }">
         <i class="fas fa-home"></i>
         <span v-if="isSidebarOpen">Dashboard</span>
@@ -26,6 +39,7 @@
         <i class="fas fa-credit-card"></i>
         <span v-if="isSidebarOpen">Transactions</span>
       </router-link>
+      
     </nav>
 
     <!-- Logout -->
@@ -39,12 +53,22 @@
 </template>
 
 <script>
+
+import { removeToken } from '@/utils/token';
+
 export default {
   name: 'Sidebar',
   data() {
     return {
       isSidebarOpen: true
     };
+  },
+  mounted() {
+    this.checkScreenWidth();
+    window.addEventListener('resize', this.checkScreenWidth);
+  },
+  beforeUnmount() {
+    window.removeEventListener('resize', this.checkScreenWidth);
   },
   watch: {
     isSidebarOpen(newVal) {
@@ -55,16 +79,75 @@ export default {
     toggleSidebar() {
       this.isSidebarOpen = !this.isSidebarOpen;
     },
-    logout() {
-      localStorage.removeItem('authToken');
-      this.$router.push('/login');
-    }
+  logout() {
+    removeToken();
+    this.$router.push('/login');
+  },
+  checkScreenWidth() {
+      if (window.innerWidth <= 768) {
+        this.isSidebarOpen = false;
+      } else {
+        this.isSidebarOpen = true;
+      }
+  }
+
   }
 };
 </script>
 
 <style scoped>
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
+.profile-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 18px;
+  transition: all 0.3s;
+  padding-top: 1rem; /* Add padding to compensate for removed image */
+}
+.profile-info {
+  text-align: center;
+  width: 100%;
+}
+.profile-name {
+  font-weight: 600;
+  font-size: 16px;
+  color: #fff;
+  margin-bottom: 2px;
+}
+.profile-email {
+  font-size: 13px;
+  color: #bdc3c7;
+  word-break: break-all;
+}
+.profile-role {
+  font-size: 13px;
+  color: #7ed957; /* A green color for role */
+  margin-top: 4px;
+  font-weight: 500;
+}
+.view-profile-btn {
+  margin-top: 10px;
+  background: #34495e;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.view-profile-btn:hover {
+  background: #4e6a85;
+}
+.sidebar.collapsed .profile-section {
+  margin-bottom: 10px;
+}
+.sidebar.collapsed .profile-info {
+  display: none;
+}
 
 .sidebar {
   width: 240px;
@@ -167,5 +250,15 @@ export default {
 
 .logout-btn:hover {
   background-color: #a43427;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 80px; /* Collapsed width */
+  }
+  .sidebar:not(.collapsed) {
+    width: 240px; /* Expanded width for temporary view */
+  }
 }
 </style>
